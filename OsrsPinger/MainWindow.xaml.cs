@@ -1,10 +1,11 @@
 ﻿using Pinger;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace OsrsPinger
 {
@@ -16,6 +17,7 @@ namespace OsrsPinger
         private PingTool pinger;
         private long lowestPing = 999;
         private List<int> lowestPingWorldList = new List<int>();
+        private Stopwatch time;
         private Thread thread;
         private ObservableCollection<RSWorld> _worlds;
 
@@ -27,6 +29,7 @@ namespace OsrsPinger
 
             pinger = new PingTool();
             _worlds = new ObservableCollection<RSWorld>();
+            time = new Stopwatch();
 
             Run();
         }
@@ -37,9 +40,6 @@ namespace OsrsPinger
 
             thread = new Thread(PingWorlds);
             thread.Start();
-
-            Thread checkThread = new Thread(EnableRefreshButton);
-            checkThread.Start();
         }
 
         private void Reset()
@@ -52,55 +52,43 @@ namespace OsrsPinger
             PingGrid.Items.Refresh();
         }
 
-        private void EnableRefreshButton()
-        {
-            while (thread.IsAlive) { Thread.Sleep(100); }
-            Dispatcher.Invoke(() => RefreshBtn.IsEnabled = true);
-        }
-
         private void PingWorlds()
         {
-            for (int i = 1; i <= 94; i++)
-            {
-                string host = $"oldschool{i}.runescape.com";
-                long ping = pinger.Ping(host);
+            Dispatcher.Invoke(() => RefreshBtn.IsEnabled = false);
+            time.Reset();
+            time.Start();
+            string[] urls = new string[94];
+            for (int i = 0; i < 94; i++)
+                urls[i] = $"oldschool{i + 1}.runescape.com";
 
+            var pingResults = pinger.PingAsync(urls);
+            foreach (KeyValuePair<int, long> pingResult in pingResults)
+            {
+                long ping = pingResult.Value;
                 if (ping != 999)
                 {
                     if (lowestPing == ping)
-                    {
-                        lowestPingWorldList.Add(i);
-                    }
-
+                        lowestPingWorldList.Add(pingResult.Key);
                     if (lowestPing > ping)
                     {
                         lowestPingWorldList.Clear();
 
                         lowestPing = ping;
-                        lowestPingWorldList.Add(i);
+                        lowestPingWorldList.Add(pingResult.Key);
                     }
-
-                    Dispatcher.Invoke(() => AddRow(i, ping));
-                    Dispatcher.Invoke(() =>
-                    {
-                        Decorator dec = (Decorator)VisualTreeHelper.GetChild(PingGrid, 0);
-                        if (dec != null)
-                        {
-                            ScrollViewer scrollViewer = (ScrollViewer)dec.Child;
-                            if (scrollViewer != null)
-                            {
-                                scrollViewer.ScrollToEnd();
-                            }
-                        }
-                    });
                 }
+
+                Dispatcher.Invoke(() => AddRow(pingResult.Key, ping));
             }
+            time.Stop();
             SetLowestPingWorlds();
+            Dispatcher.Invoke(() => RefreshBtn.IsEnabled = true);
         }
 
         private void SetLowestPingWorlds()
         {
             bool first = false;
+            Dispatcher.Invoke(() => LowestTblk.Text += $"Operation took {time.Elapsed}\n");
             foreach (var world in lowestPingWorldList)
             {
                 if (!first)
@@ -114,8 +102,24 @@ namespace OsrsPinger
             }
             Dispatcher.Invoke(() => LowestTblk.Text = LowestTblk.Text.Remove(LowestTblk.Text.Length - 2));
             Dispatcher.Invoke(() => LowestTblk.Text += $": {lowestPing}ms");
+            Dispatcher.Invoke(SortWorlds);
+        }
 
+        private void SortWorlds()
+        {
+            var column = PingGrid.Columns[1];
 
+            PingGrid.Items.SortDescriptions.Clear();
+
+            PingGrid.Items.SortDescriptions.Add(new SortDescription(column.SortMemberPath, ListSortDirection.Ascending));
+
+            foreach (var pingGridColumn in PingGrid.Columns)
+            {
+                pingGridColumn.SortDirection = null;
+            }
+            column.SortDirection = ListSortDirection.Ascending;
+
+            PingGrid.Items.Refresh();
         }
 
         private void AddRow(int world, long ping)
