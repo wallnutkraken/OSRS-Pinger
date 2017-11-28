@@ -1,3 +1,3 @@
 -- OSRS Pinger --
 
-Pings all OSRS worlds and tells you the ones with the lowest ping
+Pings all OSRS worlds and shows you the lowest pings
