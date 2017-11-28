@@ -1,0 +1,9 @@
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\bin\Release\netstandard2.0\Pinger.deps.json
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\bin\Release\netstandard2.0\Pinger.dll
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\bin\Release\netstandard2.0\Pinger.pdb
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\obj\Release\netstandard2.0\Pinger.csprojResolveAssemblyReference.cache
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\obj\Release\netstandard2.0\Pinger.csproj.CoreCompileInputs.cache
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\obj\Release\netstandard2.0\Pinger.AssemblyInfoInputs.cache
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\obj\Release\netstandard2.0\Pinger.AssemblyInfo.cs
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\obj\Release\netstandard2.0\Pinger.dll
+C:\Users\Tobib\Documents\Visual Studio 2017\Projects\OsrsPinger\Pinger\obj\Release\netstandard2.0\Pinger.pdb
