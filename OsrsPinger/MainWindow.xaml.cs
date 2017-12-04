@@ -73,9 +73,10 @@ namespace OsrsPinger
                 }
             }
             _time.Stop();
-
+#if DEBUG
             string elapsed = _time.Elapsed.Milliseconds.ToString();
             Dispatcher.Invoke(() => StopwatchTb.Text = $"Operation took: {elapsed}ms");
+#endif
             ContPingWorlds();
         }
 
