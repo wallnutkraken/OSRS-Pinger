@@ -8,23 +8,23 @@
         Title="OSRSPinger" Height="600" Width="250" MinHeight="600" MinWidth="250">
     <Grid Name="MainGrid" Margin="0,0,0,0">
         <DataGrid Name="PingGrid"
-                  HorizontalAlignment="Left"
+                  HorizontalAlignment="Center"
                   Margin="10,10,10,10"
                   VerticalAlignment="Top"
-                  MaxHeight="480"
+                  MaxHeight="520"
                   IsReadOnly="true"
                   CanUserResizeRows="False"
                   CanUserResizeColumns="False"
                   SelectionUnit="Cell"
                   RowHeaderWidth="0"/>
-   
 
-        <Button Name="RefreshBtn"
-                Content="Refresh"
-                HorizontalAlignment="Right"
-                Margin="0,539,10,0"
-                VerticalAlignment="Top" Width="75"
-                Click="RefreshBtn_OnClick_" />
+        <TextBlock
+                Name="StopwatchTb"
+                Height="20"
+                Width="210"
+                Margin="10,10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"/>
 
     </Grid>
 </Window>
