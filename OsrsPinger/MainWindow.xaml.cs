@@ -1,21 +1,20 @@
-﻿using Pinger;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Windows;
 using System.Windows.Controls;
+using Pinger;
 
 namespace OsrsPinger
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        private readonly PingTool pinger;
+        private readonly PingTool _pinger;
         private long _lowestPing = 999;
         private readonly List<int> _lowestPingWorldList = new List<int>();
         private readonly Stopwatch _time;
@@ -27,7 +26,7 @@ namespace OsrsPinger
         {
             InitializeComponent();
 
-            pinger = new PingTool();
+            _pinger = new PingTool();
             PingGrid.AllowDrop = false;
             _worlds = new ObservableCollection<RSWorld>();
             PingGrid.ItemsSource = _worlds;
@@ -63,7 +62,7 @@ namespace OsrsPinger
             for (int i = 0; i < 94; i++)
                 urls[i] = $"oldschool{i + 1}.runescape.com";
 
-            Dictionary<int, long> pingResults = pinger.PingAsync(urls);
+            Dictionary<int, long> pingResults = _pinger.PingAsync(urls);
             foreach (KeyValuePair<int, long> pingResult in pingResults)
             {
                 long ping = pingResult.Value;
@@ -94,7 +93,7 @@ namespace OsrsPinger
                         for (int j = 0; j < _lowestPingWorldList.Count; j++)
                         {
                             RSWorld currentWorld = _worlds.First(w => w.World == _lowestPingWorldList[i]);
-                            currentWorld.Ping = pinger.Ping($"oldschool{_lowestPingWorldList[i]}.runescape.com");
+                            currentWorld.Ping = _pinger.Ping($"oldschool{_lowestPingWorldList[i]}.runescape.com");
                             int beforeCount = _lowestPingWorldList.Count;
                             HandlePingChanges(currentWorld.World, currentWorld.Ping);
                             if (_lowestPingWorldList.Count < beforeCount) j = 0;
@@ -106,7 +105,7 @@ namespace OsrsPinger
 
                         for (int j = 0; j < _worlds.Count; j++)
                         {
-                            _worlds[j].Ping = pinger.Ping($"oldschool{_worlds[j].World}.runescape.com");
+                            _worlds[j].Ping = _pinger.Ping($"oldschool{_worlds[j].World}.runescape.com");
                             HandlePingChanges(_worlds[j].World, _worlds[j].Ping);
                         }
                         i = 0;
