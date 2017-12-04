@@ -50,7 +50,7 @@ namespace OsrsPinger
             if (contThread != null && contThread.IsAlive) contThread.Abort();
 
             RefreshBtn.IsEnabled = false;
-            LowestTblk.Text = string.Empty;
+         
             _worlds.Clear();
             PingGrid.Items.Refresh();
         }

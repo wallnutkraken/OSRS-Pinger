@@ -22,15 +22,9 @@
         <Button Name="RefreshBtn"
                 Content="Refresh"
                 HorizontalAlignment="Right"
-                Margin="0,470,10,0"
+                Margin="0,539,10,0"
                 VerticalAlignment="Top" Width="75"
                 Click="RefreshBtn_OnClick_" />
 
-        <TextBlock Name="LowestTblk"
-                   HorizontalAlignment="Left"
-                   Margin="10,495,0,0"
-                   TextWrapping="Wrap"
-                   Text="TextBlock"
-                   VerticalAlignment="Top" Width="222" Height="64" />
     </Grid>
 </Window>
