@@ -28,8 +28,7 @@ namespace Pinger
             Ping ping = new Ping();
             try
             {
-                PingReply reply = ping.Send(uri);
-                return reply.RoundtripTime;
+                return ping.Send(uri).RoundtripTime;
             }
             catch
             {

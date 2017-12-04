@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Forms;
 
 namespace OsrsPinger
 {
@@ -20,16 +21,19 @@ namespace OsrsPinger
         private Stopwatch time;
         private Thread thread;
         private ObservableCollection<RSWorld> _worlds;
-
+        private Thread contThread;
         public MainWindow()
         {
             InitializeComponent();
 
-            PingGrid.AllowDrop = false;
-
             pinger = new PingTool();
+            PingGrid.AllowDrop = false;
             _worlds = new ObservableCollection<RSWorld>();
+            PingGrid.ItemsSource = _worlds;
             time = new Stopwatch();
+
+            thread = new Thread(PingWorlds);
+            contThread = new Thread(ContPingWorlds);
 
             Run();
         }
@@ -37,14 +41,13 @@ namespace OsrsPinger
         private void Run()
         {
             Reset();
-
-            thread = new Thread(PingWorlds);
             thread.Start();
         }
 
         private void Reset()
         {
-            if (thread != null && thread.IsAlive) thread?.Abort();
+            if (thread != null && thread.IsAlive) thread.Abort();
+            if (contThread != null && contThread.IsAlive) contThread.Abort();
 
             RefreshBtn.IsEnabled = false;
             LowestTblk.Text = string.Empty;
@@ -55,8 +58,10 @@ namespace OsrsPinger
         private void PingWorlds()
         {
             Dispatcher.Invoke(() => RefreshBtn.IsEnabled = false);
+
             time.Reset();
             time.Start();
+
             string[] urls = new string[94];
             for (int i = 0; i < 94; i++)
                 urls[i] = $"oldschool{i + 1}.runescape.com";
@@ -65,52 +70,78 @@ namespace OsrsPinger
             foreach (KeyValuePair<int, long> pingResult in pingResults)
             {
                 long ping = pingResult.Value;
-                if (ping != 999)
+                if (ping != 999 && ping != 0)
                 {
-                    if (lowestPing == ping)
-                        lowestPingWorldList.Add(pingResult.Key);
-                    if (lowestPing > ping)
-                    {
-                        lowestPingWorldList.Clear();
-
-                        lowestPing = ping;
-                        lowestPingWorldList.Add(pingResult.Key);
-                    }
+                    Dispatcher.Invoke(() => AddRow(pingResult.Key, ping));
                 }
 
-                Dispatcher.Invoke(() => AddRow(pingResult.Key, ping));
             }
             time.Stop();
-            SetLowestPingWorlds();
+            contThread.Start();
             Dispatcher.Invoke(() => RefreshBtn.IsEnabled = true);
         }
 
-        private void SetLowestPingWorlds()
+        private void ContPingWorlds()
         {
-            bool first = false;
-            Dispatcher.Invoke(() => LowestTblk.Text += $"Operation took {time.Elapsed}\n");
-            foreach (var world in lowestPingWorldList)
+            while (true)
             {
-                if (!first)
+                for (int i = 0; i < 2; i++)
                 {
-                    Dispatcher.Invoke(() => LowestTblk.Text += $"Lowest Ping:\nWorld {world}, ");
-                    first = true;
-                    continue;
-                }
+                    Dispatcher.Invoke(SortWorlds);
+                    switch (i)
+                    {
+                        case (0):
+                            foreach (var lowPingWorld in lowestPingWorldList)
+                            {
+                                var currentWorld = _worlds.First(w => w.World == lowPingWorld);
+                                currentWorld.Ping = pinger.Ping($"oldschool{lowPingWorld}.runescape.com");
 
-                Dispatcher.Invoke(() => LowestTblk.Text += $"{world}, ");
+                                HandlePingChanges(currentWorld.World, currentWorld.Ping);
+                            }
+                            break;
+
+                        case (1):
+
+                            foreach (var world in _worlds)
+                            {
+                                var ping = world.Ping;
+                                world.Ping = pinger.Ping($"oldschool{world.World}.runescape.com");
+
+                                HandlePingChanges(world.World, world.Ping);
+                            }
+                            i = 0;
+                            break;
+                    }
+                }
             }
-            Dispatcher.Invoke(() => LowestTblk.Text = LowestTblk.Text.Remove(LowestTblk.Text.Length - 2));
-            Dispatcher.Invoke(() => LowestTblk.Text += $": {lowestPing}ms");
-            Dispatcher.Invoke(SortWorlds);
         }
+
+        private void HandlePingChanges(int world, long ping)
+        {
+            if (ping > lowestPing)
+            {
+                lowestPingWorldList.Remove(world);
+                return;
+            }
+
+            if (ping == lowestPing)
+            {
+                if(!lowestPingWorldList.Exists(w => w == world))
+                lowestPingWorldList.Add(world);
+                return;
+            }
+
+            lowestPing = ping;
+            lowestPingWorldList.Clear();
+            lowestPingWorldList.Add(world);
+        }
+
 
         private void SortWorlds()
         {
             var column = PingGrid.Columns[1];
 
             PingGrid.Items.SortDescriptions.Clear();
-
             PingGrid.Items.SortDescriptions.Add(new SortDescription(column.SortMemberPath, ListSortDirection.Ascending));
 
             foreach (var pingGridColumn in PingGrid.Columns)
@@ -125,7 +156,7 @@ namespace OsrsPinger
         private void AddRow(int world, long ping)
         {
             _worlds.Add(new RSWorld(world, ping));
-            PingGrid.ItemsSource = _worlds;
+            PingGrid.Items.Refresh();
         }
 
         private void RefreshBtn_OnClick_(object sender, RoutedEventArgs e)

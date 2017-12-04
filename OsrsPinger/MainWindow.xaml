@@ -16,12 +16,13 @@
                   CanUserResizeRows="False"
                   CanUserResizeColumns="False"
                   SelectionUnit="Cell"
-                  RowHeaderWidth="0" />
+                  RowHeaderWidth="0"/>
+   
 
         <Button Name="RefreshBtn"
                 Content="Refresh"
                 HorizontalAlignment="Right"
-                Margin="10,10,10,10"
+                Margin="0,470,10,0"
                 VerticalAlignment="Top" Width="75"
                 Click="RefreshBtn_OnClick_" />
 
@@ -30,6 +31,6 @@
                    Margin="10,495,0,0"
                    TextWrapping="Wrap"
                    Text="TextBlock"
-                   VerticalAlignment="Top" />
+                   VerticalAlignment="Top" Width="222" Height="64" />
     </Grid>
 </Window>
