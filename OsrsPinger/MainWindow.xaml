@@ -16,7 +16,7 @@
                   CanUserResizeRows="False"
                   CanUserResizeColumns="False"
                   SelectionUnit="Cell"
-                  RowHeaderWidth="0"/>
+                  RowHeaderWidth="0" />
 
         <TextBlock
                 Name="StopwatchTb"
@@ -24,7 +24,6 @@
                 Width="210"
                 Margin="10,10"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"/>
-
+                VerticalAlignment="Bottom" />
     </Grid>
 </Window>

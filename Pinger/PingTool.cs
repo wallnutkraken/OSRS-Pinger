@@ -12,7 +12,6 @@ namespace Pinger
 
         public PingTool() : this(5)
         {
-
         }
 
         public PingTool(int poolSize)
