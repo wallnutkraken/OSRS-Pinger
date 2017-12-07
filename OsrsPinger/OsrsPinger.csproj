@@ -135,6 +135,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\OsrsDataRetriever\OsrsDataRetriever.csproj">
+      <Project>{69e39b8f-da62-41da-a512-87a20e888607}</Project>
+      <Name>OsrsDataRetriever</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Pinger\Pinger.csproj">
       <Project>{3ad196a5-bd64-46aa-8e75-0ad6a68b9fb0}</Project>
       <Name>Pinger</Name>

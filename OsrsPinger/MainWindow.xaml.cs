@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows.Controls;
+using OsrsDataRetriever;
 using Pinger;
 
 namespace OsrsPinger
@@ -20,6 +21,7 @@ namespace OsrsPinger
         private readonly Stopwatch _time;
         private Thread _thread;
         private readonly ObservableCollection<RSWorld> _worlds;
+        private IEnumerable<string> worldUrls;
         private bool _contPingWorlds;
 
         public MainWindow()
@@ -32,6 +34,7 @@ namespace OsrsPinger
             PingGrid.ItemsSource = _worlds;
             _time = new Stopwatch();
             _contPingWorlds = true;
+            worldUrls = Worlds.GetWorlds().OrderBy(c => c.Number).Select(w => w.Url);
 
             Run();
         }
@@ -58,11 +61,7 @@ namespace OsrsPinger
             _time.Reset();
             _time.Start();
 
-            string[] urls = new string[94];
-            for (int i = 0; i < 94; i++)
-                urls[i] = $"oldschool{i + 1}.runescape.com";
-
-            Dictionary<int, long> pingResults = _pinger.PingAsync(urls);
+            Dictionary<int, long> pingResults = _pinger.PingAsync(worldUrls);
             foreach (KeyValuePair<int, long> pingResult in pingResults)
             {
                 long ping = pingResult.Value;
